@@ -1,0 +1,396 @@
+{% extends "mainapp/base.html" %}
+
+{% block title %}
+Main Page
+{% endblock %}
+
+{% block head %}
+{% load static %}
+
+<script>
+      let map, infoWindow;
+      let currentInfoWindow;
+      let service;
+      let infoPane;
+      let bounds;
+      var pos;
+      {% comment %} var markerArray = []; {% endcomment %}
+      var places = [
+        {% for p in places_list %}
+          "{{p.google_place_id}}",
+        {% endfor %}
+      ]
+      var place_ids = [
+        {% for p in places_list %}
+          "{{p.place_id}}",
+        {% endfor %}
+      ]
+      console.log(places);
+
+      function initMap() {
+        bounds = new google.maps.LatLngBounds();
+        var latlng = new google.maps.LatLng({lat: 38.03570348563636, lng: -78.50343673057102})
+        map = new google.maps.Map(document.getElementById("map"), {
+          center: latlng,
+          zoom: 16,
+        });
+        // --------------Search Box--------------
+        // Create the search box and link it to the UI element.
+        const input = document.getElementById("pac-input");
+        const searchBox = new google.maps.places.SearchBox(input);
+        map.controls[google.maps.ControlPosition.TOP_CENTER].push(input);
+        // Bias the SearchBox results towards current map's viewport.
+        map.addListener("bounds_changed", () => {
+          searchBox.setBounds(map.getBounds());
+        });
+        let markers = [];
+        // Listen for the event fired when the user selects a prediction and retrieve
+        // more details for that place.
+        searchBox.addListener("places_changed", () => {
+        const places = searchBox.getPlaces();
+
+        if (places.length == 0) {
+          return;
+        }
+        // Clear out the old markers.
+        markers.forEach((marker) => {
+          marker.setMap(null);
+        });
+        markers = [];
+        // For each place, get the icon, name and location.
+        const bounds = new google.maps.LatLngBounds();
+        places.forEach((place) => {
+          if (!place.geometry || !place.geometry.location) {
+            console.log("Returned place contains no geometry");
+            return;
+          }
+          const icon = {
+            url: place.icon,
+            size: new google.maps.Size(71, 71),
+            origin: new google.maps.Point(0, 0),
+            anchor: new google.maps.Point(17, 34),
+            scaledSize: new google.maps.Size(25, 25),
+          };
+          // Create a marker for each place.
+          let marker = new google.maps.Marker({
+              map,
+              icon,
+              title: place.name,
+              position: place.geometry.location,
+              placeId: place.place_id,
+            });
+          // console.log(place.place_id);
+          marker.addListener("click", () => {
+            console.log(marker.placeId);
+            getPlaceInformationMarker(marker.placeId, map);
+          });
+          markers.push(marker);
+
+          {% comment %} for (var i = 0; i < markers.length; i++) {
+            markers[i]
+          } {% endcomment %}
+
+          if (place.geometry.viewport) {
+            // Only geocodes have viewport.
+            bounds.union(place.geometry.viewport);
+          } else {
+            bounds.extend(place.geometry.location);
+          }
+        });
+        map.fitBounds(bounds);
+
+
+      });
+        infoWindow = new google.maps.InfoWindow();
+        currentInfoWindow = infoWindow;
+        centerOnUser(map, currentInfoWindow)
+        /* TODO: Step 4A3: Add a generic sidebar */
+        infoPane = document.getElementById('panel');
+
+        const locationButton = document.createElement("button");
+        locationButton.textContent = "Pan to Current Location";
+        locationButton.classList.add("custom-map-control-button");
+        map.controls[google.maps.ControlPosition.TOP_LEFT].push(locationButton);
+        locationButton.addEventListener("click", () => {
+          centerOnUser(map, currentInfoWindow);
+        });
+        new ClickEventHandler(map, pos);
+      }
+
+      function getPlaceInformationMarker(placeId, map) {
+          let placesService = new google.maps.places.PlacesService(map);
+          let rating = "";
+          let price_level = "";
+          let address = "";
+          let website = "";
+          var poi_info = "";
+          var poi_change_info = "";
+          var poi_change_button = "";
+          var submit_change_button = "";
+          let request = {
+            placeId: placeId,
+            fields: ['name', 'address_components', 'geometry', 'rating',
+              'website', 'price_level', 'formatted_address']
+          };
+
+          let infowindow = new google.maps.InfoWindow();
+          infowindowContent = document.getElementById("infowindow-content");
+          infowindow.setContent(this.infowindowContent);
+
+          placesService.getDetails(request, (place, status) => {
+            if (status === "OK" && place) { 
+              // William Entriken on https://stackoverflow.com/questions/8082405/parsing-address-components-in-google-maps-upon-autocomplete-select
+              var address_components = place.address_components;
+              var components={}; 
+              jQuery.each(address_components, function(k,v1) {jQuery.each(v1.types, function(k2, v2){components[v2]=v1.long_name});});
+              var place_info = "<div class='place'> <h5>" + place.name + "</h5>";
+              if (place.rating) {
+                rating = place.rating;
+                place_info += "<p> <b> Rating: </b>" + rating + "&#10032;</p>"; 
+              }
+              if (place.price_level) {
+                price_level = place.price_level;
+                let dollar_signs = "$".repeat(parseInt(price_level));
+                place_info += "<p> <b> Price Level: </b>" + dollar_signs + "</p>"; 
+              }
+              console.log(place.formatted_address)
+              if (place.formatted_address) {
+                address = place.formatted_address;
+                place_info += "<p> <b> Address: </b>" + address + "</p>"; 
+              }
+              if (place.website) {
+                website = place.website;
+                place_info += "<p> <b> Website: </b> <a href='" + website + "'>Place Website</a></p>";
+              }
+              poi_info = place_info + "</div>";
+              if (places.includes(placeId)) {
+                console.log("place found!" + place.name);
+                poi_change_info = "";
+                let index = places.indexOf(placeId);
+                let button = "<a class='btn btn-success btn-sm' href='places/";
+                button += String(place_ids[index]);
+                button += "' role='button'>See Changes </a> \n";
+                poi_change_button = button;
+                let submit_button = "<a class='btn btn-primary btn-sm' href='places/";
+                submit_button += String(place_ids[index]);
+                submit_button += "/submit_change' role='button'>Submit Change </a> ";
+                submit_change_button = submit_button;
+              } else {
+                let street = components.route
+                console.log(street)
+                poi_change_info = "<p> No changes submitted for this place yet. </p>";
+                poi_change_button = "";
+                let submit_button = "<a class='btn btn-primary btn-sm' href='places/submit_place/";
+                submit_button += placeId + "&" + street + "&" + place.name;
+                submit_button += "' role='button'>Submit Change </a>";
+                submit_change_button = submit_button;
+              }
+
+              // Infowindow overwrite: https://developers.google.com/maps/documentation/javascript/infowindows
+
+              let infowindowHTML = poi_info + poi_change_info + poi_change_button + submit_change_button
+              infowindow.close();
+              infowindow.setPosition(place.geometry.location);
+              infowindow.setContent( infowindowHTML );
+              infowindow.open(map);
+            }
+          });   
+        }
+
+      function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+      infoWindow.setPosition(pos);
+      infoWindow.setContent(
+        browserHasGeolocation
+          ? "Error: The Geolocation service failed."
+          : "Error: Your browser doesn't support geolocation."
+      );
+      infoWindow.open(map);
+      currentInfoWindow = infoWindow;
+      }
+
+      function centerOnUser(mp, iW) {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                pos = {
+                  lat: position.coords.latitude,
+                  lng: position.coords.longitude,
+                };
+                bounds.extend(pos);
+                infoWindow.setPosition(pos);
+                infoWindow.setContent("Your current location.");
+                infoWindow.open(map);
+                map.setCenter(pos);
+                // Call Places Nearby Search on user's location
+                //getNearbyPlaces(pos);
+              },
+              () => {
+                handleLocationError(true, infoWindow, map.getCenter());
+              }
+            );
+          } else {
+            // Browser doesn't support Geolocation
+            pos = mp.getCenter()
+            handleLocationError(false, infoWindow, map.getCenter());
+          }
+      }
+
+      //----------getPOIName----------
+      function isIconMouseEvent(e) {
+        return "placeId" in e;
+      }
+      // https://developers.google.com/maps/documentation/javascript/examples/event-poi
+      class ClickEventHandler {
+        constructor(map, pos) {
+          this.origin = pos;
+          this.map = map;
+          this.placesService = new google.maps.places.PlacesService(map);
+          // Listen for clicks on the map.
+          this.map.addListener("click", this.handleClick.bind(this));
+
+          this.infowindow = new google.maps.InfoWindow();
+          this.infowindowContent = document.getElementById("infowindow-content");
+          this.infowindow.setContent(this.infowindowContent);
+        }
+        handleClick(event) {
+          console.log("You clicked on: " + event.latLng);
+
+          // If the event has a placeId, use it.
+          if (isIconMouseEvent(event)) {
+            console.log("You clicked on place:" + event.placeId);
+            // document.getElementById('poi-info').innerHTML += event.placeId;
+            // Calling e.stop() on the event prevents the default info window from
+            // showing.
+            // If you call stop here when there is no placeId you will prevent some
+            // other map click event handlers from receiving the event.
+            event.stop();
+
+            if (event.placeId) {
+              this.getPlaceInformation(event.placeId);
+            }
+          }
+        }
+        getPlaceInformation(placeId) {
+          let rating = "";
+          let price_level = "";
+          let address = "";
+          let website = "";
+          var poi_info = "";
+          var poi_change_info = "";
+          var poi_change_button = "";
+          var submit_change_button = "";
+          let request = {
+            placeId: placeId,
+            fields: ['name', 'address_components', 'geometry', 'rating',
+              'website', 'price_level', 'formatted_address']
+          };
+          this.placesService.getDetails(request, (place, status) => {
+            if (status === "OK" && place) { 
+              // William Entriken on https://stackoverflow.com/questions/8082405/parsing-address-components-in-google-maps-upon-autocomplete-select
+              var address_components = place.address_components;
+              var components={}; 
+              jQuery.each(address_components, function(k,v1) {jQuery.each(v1.types, function(k2, v2){components[v2]=v1.long_name});});
+              var place_info = "<div class='place'> <h5>" + place.name + "</h5>";
+              if (place.rating) {
+                rating = place.rating;
+                place_info += "<p> <b> Rating: </b>" + rating + "&#10032;</p>"; 
+              }
+              if (place.price_level) {
+                price_level = place.price_level;
+                let dollar_signs = "$".repeat(parseInt(price_level));
+                place_info += "<p> <b> Price Level: </b>" + dollar_signs + "</p>"; 
+              }
+              console.log(place.formatted_address)
+              if (place.formatted_address) {
+                address = place.formatted_address;
+                place_info += "<p> <b> Address: </b>" + address + "</p>"; 
+              }
+              if (place.website) {
+                website = place.website;
+                place_info += "<p> <b> Website: </b> <a href='" + website + "'>Place Website</a></p>";
+              }
+              poi_info = place_info + "</div>";
+              if (places.includes(placeId)) {
+                console.log("place found!" + place.name);
+                poi_change_info = "";
+                let index = places.indexOf(placeId);
+                let button = "<a class='btn btn-success btn-sm' href='places/";
+                button += String(place_ids[index]);
+                button += "' role='button'>See Changes </a> \n";
+                poi_change_button = button;
+                let submit_button = "<a class='btn btn-primary btn-sm' href='places/";
+                submit_button += String(place_ids[index]);
+                submit_button += "/submit_change' role='button'>Submit Change </a> ";
+                submit_change_button = submit_button;
+              } else {
+                let street = components.route
+                console.log(street)
+                poi_change_info = "<p> No changes submitted for this place yet. </p>";
+                poi_change_button = "";
+                let submit_button = "<a class='btn btn-primary btn-sm' href='places/submit_place/";
+                submit_button += placeId + "&" + street + "&" + place.name;
+                submit_button += "' role='button'>Submit Change </a>";
+                submit_change_button = submit_button;
+              }
+
+              let infowindowHTML = poi_info + poi_change_info + poi_change_button + submit_change_button
+              this.infowindow.close();
+              this.infowindow.setPosition(place.geometry.location);
+              this.infowindow.setContent( infowindowHTML );
+              this.infowindow.open(this.map);
+            }
+          });   
+        }
+      }
+
+
+      // var myModal = document.getElementById('myModal')
+      // var myInput = document.getElementById('myInput')
+
+      // myModal.addEventListener('shown.bs.modal', function () {
+      //   myInput.focus()
+      // })
+
+    </script>
+
+{% endblock %}
+
+{% block content %}
+
+<div id="full-size">
+
+    <div class="title-div">        
+      <strong>Hey friend! </strong>Click a POI on the map to get info about it! 🎯<!-- <h5 class="title-message">Click a  --><!-- POI to get info about it 🎯</h5> -->
+    </div>
+
+    <!-- <div class="alert alert-warning alert-dismissible fade show" role="alert">
+      <strong>Hey friend!</strong> 
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div> -->
+
+    <!-- TODO: Step 4A2: Add a generic sidebar -->
+    <!-- The slide-out panel for showing place details -->
+    <!-- <div id="panel"></div> -->
+    <div id="searchbar-container">
+      <input
+        id="pac-input"
+        class="controls"
+        type="text"
+        placeholder="Search For Places Near You"
+      />
+    </div>
+    <div id="map"></div>
+
+</div>
+
+    <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBLRJWPRyhXoAxn5oj_ajZMFSd5fk8xl54&callback=initMap&libraries=&v=weekly&libraries=places,geometry"
+      async
+    ></script>
+{% endblock %}
+
+
+

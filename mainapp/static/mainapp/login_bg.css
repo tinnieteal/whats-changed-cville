@@ -1,0 +1,31 @@
+li a {
+    color: green;
+}
+body {
+    background: white url("images/login_back.svg") no-repeat center fixed;
+    background-size: cover;
+}
+
+.content {
+    max-width: 500px;
+    margin: auto;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+}
+
+#login-card {
+    margin:300px,300px;
+}
+
+.login-button-container{
+    text-align: center;
+    margin: auto;
+    display: grid; 
+    margin-top: 20px;
+}
+
+    /*display: flex;*/

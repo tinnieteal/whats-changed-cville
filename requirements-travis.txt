@@ -1,0 +1,7 @@
+Django
+gunicorn
+django-heroku
+django-allauth
+oauth2
+mock
+whitenoise

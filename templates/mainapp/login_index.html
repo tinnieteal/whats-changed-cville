@@ -1,0 +1,60 @@
+{% extends "mainapp/base.html" %}
+
+{% block title %}
+Main Page
+{% endblock %}
+
+{% block head %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'mainapp/login_bg.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="main-content">
+    <div class="card text-center mx-auto" style="
+        max-width: 30%;
+        min-width: 20%;
+        border-radius: 0.5em;
+        padding: 1em;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-right: -50%;
+        transform: translate(-50%, -50%) ">
+      {% load socialaccount %}
+      
+      <h5 class="card-header" style="
+        border-radius: 0.5em; 
+        margin-top: 10px; 
+        margin-left: 20px; 
+        margin-right: 20px;">
+
+      Welcome to What's Changed.</h5>
+      {% if user.is_authenticated %}
+      <h5 class="card-title" style="padding-top: 20px">Welcome, {{ user.username }} !</h5>
+      <div class="card-body" style="padding-top: 10px">
+        <p class="card-text">Excited to see what's changed about Charlottesville since COVID-19? Click on the map in the navigation bar! You are also welcome to submit a change by clicking a spot on the map! </p>
+      
+      {% else %}
+        <div class="row">
+          <div class="card-body" style="padding-top: 10px">
+            <p class="card-text" style="padding-top: 20px">Please log in to see changes of Charlottesville since COVID-19 or submit a change that you observed. </p>
+            
+          <!-- Google signin button ui: https://developers.google.com/identity/sign-in/web/build-button -->
+          <div class="button-container" style="padding-top: 20px;">
+            <a class="btn btn-outline-dark" href="{% provider_login_url 'google' %}" role="button" style="
+              text-transform:none;">
+              <img width="20px" style="margin-bottom:3px; margin-right:5px" alt="Google sign-in" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png" />
+            Login with Google
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+</main>
+
+{% endblock %}
+
+
+

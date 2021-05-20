@@ -1,0 +1,32 @@
+{% extends "mainapp/base.html" %}
+{% block head %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'mainapp/listItem.css' %}">
+{% endblock %}
+{% block content %}
+
+
+<div class="container text-center text-dark" id="title-message">
+    <h2>Select a Place to See Changes</h2>
+</div>
+<!--Learned from https://getbootstrap.com/docs/4.0/components/list-group/-->
+<div class="container" style="padding-bottom: 20px">
+    <div class="list-group active">
+        {% for place in places_list %}
+            <a href="{% url 'mainapp:changes' place.id %}" class="list-group-item list-group-item-action flex-column align-items-start py-2">
+                <div class="d-flex justify-content-between">
+                    <b><p class="mb-0 text-wrap"><b>{{ place.place_name }}</b> on {{ place.place_address }}</p></b>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+    
+</div>
+
+{% comment %} 
+<div class="container text-center">
+<a class="btn btn-primary" href="{% url 'mainapp:submit_place' %}" role="button">Submit Place</a>
+</div> 
+{% endcomment %}
+
+{% endblock %}

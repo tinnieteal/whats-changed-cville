@@ -1,0 +1,23 @@
+{% extends "mainapp/base.html" %}
+
+{% block content %}
+<div class="container text-center" id="title-message">
+    <h2> Submit Comment:</h2>
+</div>
+<!-- <hr class="mt-0 mb-4">
+ -->
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<div class="container-fluid p-3 my-3 bg-light content" style="max-width: 500px; border-radius: 5px">
+    <form method="post">{% csrf_token %}
+    <div class="form-group">
+    <p><label for="comments">Comment:</label>
+    <input class="form-control" id="body" type="text" name="body" maxlength="100" placeholder="Enter your comment." required></p>
+    </div>
+
+    <div style="padding-top: 10px;text-align: center">
+            <input type="submit" value="Submit"></div>
+    </div>
+    </form>
+</div>
+{% endblock %}

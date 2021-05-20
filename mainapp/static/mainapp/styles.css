@@ -1,0 +1,139 @@
+html,
+body {
+    margin:0; 
+    padding:0; 
+    height: 100%;
+}
+
+#full-size{
+  height:100%;
+  width:100%;
+  overflow:hidden; /* or overflow:auto; if you want scrollbars */
+  /*overflow:auto;*/
+  position: fixed; 
+}
+
+.footer {
+    position:absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: black;
+    color: #6c757d;
+    text-align: center;
+    padding: 4px;
+    height: 2.5rem;            
+}
+
+#title-message{
+    margin-top:30px;
+    margin-bottom:50px;
+}
+
+#map {
+    height:100%;
+}
+
+/*#panel {
+    height: 100%;
+    width: null;
+    background-color: white;
+    position: fixed;
+    z-index: 1;
+    overflow-x: hidden;
+    transition: all .2s ease-out;
+    margin-top: 20px;
+}*/
+
+.open {
+    width: 250px;
+}
+
+  /* Styling for place details */
+.hero {
+    width: 100%;
+    height: auto;
+    max-height: 166px;
+    display: block;
+}
+
+.place,
+  p {
+    padding-left: 4px;
+    padding-right: 4px;
+    margin-bottom: 4px;
+}
+
+.gm-style .gm-style-iw {
+    font-size: 18px ;
+    font-weight: 400 ;
+}
+
+.details {
+    color: darkslategrey;
+ }
+
+
+a {
+    text-decoration: none;
+    /* color: cadetblue; */
+}
+
+
+#pac-input {
+    flex: 1;
+    width: 400px;
+    height: 50px;
+    border-radius: 5px;
+    border: 2px solid lightgrey;
+    /*padding-left: 30px;*/
+    font-size: 17px;
+    padding-left: 25px;
+    transition-duration: 0.4s;
+
+}
+
+#pac-input:hover {
+    box-shadow: 0px 1px 5px lightgrey;
+}
+
+#pac-input:focus {
+    outline: none !important;
+}
+
+.title-div {
+    text-align: center;
+    padding-top: 13px;
+}
+
+#searchbar-container {
+    margin-top: 10px;
+}
+
+.custom-map-control-button {
+    flex: 1;
+    width: 250px;
+    height: 50px;
+    border-radius: 5px;
+    /*padding-left: 30px;*/
+    font-size: 17px;
+    text-align: center;
+    border: 2px solid  #307DF6;
+    background-color: #fff;
+    transition-duration: 0.4s;
+}
+.custom-map-control-button:hover {
+  background-color: #307DF6; 
+  color: white;
+}
+
+#button-container {
+    text-align: center;
+    justify-content: center;
+    /*margin: auto;
+    display: grid; 
+    margin-top: 20px;*/
+}
+
+
+

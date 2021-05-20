@@ -1,0 +1,41 @@
+{% extends "mainapp/base.html" %}
+
+
+{% block content %}
+
+<div class="container text-center" id="title-message">
+	<h2>{{ place.id }}. {{ place.place_name }}</h2>
+</div>
+<div style="padding-left:50px;padding-right:50px;">
+	<table class="table table-light" style="border-radius: 8px;opacity: 0.9">
+		<div style="text-align: center; padding-bottom: 25px">
+			<h5>Click on a change to view comments 👀</h5>
+		</div>
+		<thead>
+		<tr>
+		  <th scope="col">#</th>
+		  <th scope="col">Change</th>
+		  <th scope="col">Submitted By</th>
+		  <th scope="col">Time</th>
+		  <th scope="col">Covid-Rating</th>
+		</tr>
+		</thead>
+		<tbody>
+		{% for change in place.change_set.all %}
+		<tr>
+		  <th scope="row">{{ forloop.counter }}</th>
+		  <td><a href="{% url 'mainapp:comments' change.id %}">{{ change.place_change }}</a></td>
+		  <td>{{change.submitting_user }}</td>
+		  <td>{{change.submission_time}}</td>
+		  <td>{{change.covid_rating}}</td>
+		</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+</div> 	
+
+<div class="container text-center">
+	<a class="btn btn-primary" href="{% url 'mainapp:submit_change' place.id %}" role="button">Submit Change</a>
+</div>
+
+{% endblock %}

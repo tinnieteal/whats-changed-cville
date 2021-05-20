@@ -1,0 +1,42 @@
+{% extends "mainapp/base.html" %}
+
+{% block head %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'mainapp/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container text-center" id="title-message">
+    <h2> Change Request:</h2>
+</div>
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<div class="container-fluid p-3 my-3 bg-light content" style="max-width: 500px;border-radius: 8px">
+    <form method="post" style="padding:20px">{% csrf_token %}
+        <div class="form-group">
+            <label for="place_change">Changes:</label>
+            <input class="form-control" id="place_change" type="text" name="place_change" maxlength="100" placeholder="What has changed?" required></p>
+        </div>
+    
+        <div class="form-group">
+            <label for="covid_rating">Covid_Rating:</label>
+                <div class="radio-container" style= "display: flex; justify-content: space-around;">
+                    {% for radio in form.covid_rating %}
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label" for="{{ radio.id_for_label }}">
+                            <span class="radio">{{ radio.tag }}</span>
+                            {{ radio.choice_label }}
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+        </div>
+
+        <div style="padding-top: 10px;text-align: center">
+            <input type="submit" value="Submit"></div>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
+

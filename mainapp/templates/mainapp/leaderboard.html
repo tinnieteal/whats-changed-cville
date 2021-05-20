@@ -1,0 +1,44 @@
+{% extends "mainapp/base.html" %}
+
+{% block title %}
+What's Changed
+{% endblock %}
+
+{% block content %}
+
+<main class="main-content">
+<div class="container text-center text-dark" id="title-message">
+        <h2>Leaderboard of Most Changes Submitted</h2>
+    </div>
+<div class="container">
+    <div class="row justify-content-md-center">
+      <div class="col-md-auto">
+        <ul class="list-group">
+            
+                <table class="table table-light" style="border-radius: 8px; opacity: 0.9">
+                    <thead>
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">User Name</th>
+                      <th scope="col">Number of Submission</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for person in leaderboard %}
+                    <tr>
+                      <th scope="row">{{ forloop.counter }}</th>
+                      <td>{{ person.user }}</td>
+                      <td>{{ person.num_submissions }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+        </ul>
+      </div>
+    </div>
+</div>
+
+</main>
+
+
+{% endblock %}

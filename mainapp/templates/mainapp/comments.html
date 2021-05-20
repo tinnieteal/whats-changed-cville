@@ -1,0 +1,37 @@
+{% extends "mainapp/base.html" %}
+{% block head %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'mainapp/listItem.css' %}">
+{% endblock %}
+{% block content %}
+
+<div class="container text-center text-dark" id="title-message">
+	<h2>{{ change.id }}. {{ change.place_change }}</h2>
+</div>
+<div style="padding-left:50px;padding-right:50px;">
+	<table class="table table-light" style="border-radius: 8px;opacity: 0.9">
+		<thead>
+		<tr>
+		  <th scope="col">#</th>
+		  <th scope="col">Comment</th>
+		  <th scope="col">Submitted By</th>
+		  <th scope="col">Time</th>
+		</tr>
+		</thead>
+		<tbody>
+			{% for comment in change.comment_set.all %}
+		<tr>
+		  <th scope="row">{{ forloop.counter }}</th>
+		  <td>{{ comment.body }}</td>
+		  <td> {{ comment.user_name }} </td>
+		  <td>{{comment.created_on}}</td>
+		</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+</div>
+<div class="container text-center">
+	<a class="btn btn-primary" href="{% url 'mainapp:submit_comments' change.id %}" role="button">Submit Comment</a>
+</div>		
+
+{% endblock %}

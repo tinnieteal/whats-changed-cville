@@ -1,0 +1,84 @@
+{% load static %}
+<!--Bootstrap Getting Started: https://getbootstrap.com/docs/4.0/getting-started/introduction/-->
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{% static 'mainapp/login_bg.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'mainapp/styles.css' %}">
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
+
+    <title>{% block title %}{% endblock %}</title>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <!-- Minified CSS and JS -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" 
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" 
+            crossorigin="anonymous">
+    </script>
+
+    {% block head %}
+    {% endblock %}
+  </head>
+  <!--Learned NavBar from: https://getbootstrap.com/docs/4.0/components/navbar/-->
+  <body class="body" >
+    <div style="position: relative; min-height: 100vh;">
+    <div style="padding-bottom: 2.5rem; ">
+    <header>
+      <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+        <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
+            <ul class="navbar-nav mr-auto">
+              {% url 'mainapp:map' as mapurl %}
+              {% url 'mainapp:places' as placeurl %}
+              {% url 'mainapp:leaderboard' as leadurl %}
+              <li class="nav-item {% if mapurl == request.path   %}active{% endif %}">
+                  <a class="nav-link" href="{% url 'mainapp:map'%}">Map</a>
+              </li>
+              <li class="nav-item {% if placeurl in request.path   %}active{% endif %}">
+                  <a class="nav-link" href="{% url 'mainapp:places'%}">See Changes</a>
+              </li>
+              <li class="nav-item {% if leadurl in request.path   %}active{% endif %}">
+                <a class="nav-link" href="{% url 'mainapp:leaderboard'%}">Leaderboard</a>
+            </li>
+            </ul>
+        </div>
+        <div class="mx-auto order-0">
+          <a class="navbar-brand mx-auto text-light">Welcome to What's Changed!</a>
+        </div>
+        <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+            <ul class="navbar-nav ml-auto">
+              {% url 'mainapp:map' as mapurl %}
+              {% url 'mainapp:places' as placeurl %}
+              {% url 'mainapp:leaderboard' as leadurl %}
+              <li class="nav-item navbar-right">
+                <a class="nav-link" href="/accounts/logout/">Log out</a>
+              </li>
+            </ul>
+        </div>
+    </nav>
+    </header>
+
+    {% block content %}
+    {% endblock %}
+    </div>
+    <!--Learned Footer from:https://getbootstrap.com/docs/4.1/components/card/#header-and-footer -->
+    <footer class="footer">
+      <div class="container">
+        <span class="text-muted">        
+        <small>Copyright &copy; Team A-29</small>
+        </span>
+      </div>
+    </footer>
+
+    </div>
+
+  </body>
+
+</html>
